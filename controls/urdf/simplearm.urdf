@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<robot name="two_cylinders">
+
+  <material name="red"><color rgba="1 0 0 1"/></material>
+  <material name="blue"><color rgba="0 0 1 1"/></material>
+
+  <link name="base_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.2" length="1.5"/></geometry><material name="red"/></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0"/><geometry><cylinder radius="0.2" length="1.5"/></geometry></collision>
+    <inertial><mass value="10"/><origin xyz="0 0 0"/><inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/></inertial>
+  </link>
+
+  <link name="second_link">
+    <visual><origin xyz="0 0 0.7" rpy="0 0 0"/><geometry><cylinder radius="0.15" length="1.5"/></geometry><material name="blue"/></visual>
+    <collision><origin xyz="0 0 0.7" rpy="0 0 0"/><geometry><cylinder radius="0.15" length="1.5"/></geometry></collision>
+    <inertial><mass value="5"/><origin xyz="0 0 0"/><inertia ixx="0.5" ixy="0" ixz="0" iyy="0.5" iyz="0" izz="0.5"/></inertial>
+  </link>
+
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child  link="second_link"/>
+    <origin xyz="0.35 0 0.7" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+  </joint>
+
+  <!-- Gazebo-Classic ros2_control plugin -->
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <!-- use your real absolute path below -->
+      <parameters>/home/nithin/two_ws/src/controls/config/simple_controllers.yaml</parameters>
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+      <controller_manager_name>controller_manager</controller_manager_name>
+    </plugin>
+  </gazebo>
+
+  <ros2_control name="RobotSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="joint1">            <!-- match the URDF joint name -->
+      <command_interface name="position"/>
+      <state_interface   name="position"/>
+      <state_interface   name="velocity"/>
+    </joint>
+  </ros2_control>
+
+
+</robot>

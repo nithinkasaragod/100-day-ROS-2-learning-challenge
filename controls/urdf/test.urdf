@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<robot name="two_cylinders">
+
+  <!-- Define a red material for the first cylinder -->
+  <material name="red">
+    <color rgba="1 0 0 1"/>
+  </material>
+
+  <!-- Define a blue material for the second cylinder -->
+  <material name="blue">
+    <color rgba="0 0 1 1"/>
+  </material>
+
+  <!-- Base Link - First Cylinder -->
+  <!-- This cylinder has a radius of 1.5m (3m diameter) and a length of 1m. -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.2" length="1.5"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.2" length="1.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- Mass and inertia for a solid aluminum cylinder -->
+      <!-- mass = pi * r^2 * h * density -->
+      <mass value="19154"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="12258" ixy="0" ixz="0"
+               iyy="12258" iyz="0"
+               izz="21548"/>
+    </inertial>
+  </link>
+
+  <!-- Second Link - Second Cylinder -->
+  <!-- This cylinder has a radius of 2m and a length of 1m. -->
+  <link name="second_link">
+    <visual>
+      <origin xyz="0 0 0.7" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.15" length="1.5"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.7" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.15" length="1.5"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- Mass and inertia for a solid aluminum cylinder -->
+      <!-- mass = pi * r^2 * h * density -->
+      <mass value="34054"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="36891" ixy="0" ixz="0"
+               iyy="36891" iyz="0"
+               izz="68108"/>
+    </inertial>
+  </link>
+
+  <!-- Joint between base_link and second_link -->
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="second_link"/>
+ 
+    <origin xyz="0.35 0 0.7" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+  </joint>
+
+
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <ros>
+          <argument>--ros-args</argument>
+          <argument>--params-file</argument>
+          <argument>/home/nivmini/old_ws_archives/ros2control_ws/src/controls/config/simple_controllers.yaml</argument>
+        </ros>
+    </plugin>
+  </gazebo>
+
+  <ros2_control name="RobotSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+
+    <joint name="joint_1">
+      <command_interface name="position"/>
+      <state_interface   name="position"/>
+    </joint>
+  </ros2_control>
+
+</robot>
